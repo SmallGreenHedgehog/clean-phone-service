@@ -19,15 +19,7 @@ def prepare_russian_phone(phone: str):
 @app.route('/api/v1/single-phone/', methods=['GET'])
 @app.route('/api/v1/single-phone/<string:phone>', methods=['GET'])
 def single_phone_page(phone=''):
-    global last_phone
-    last_phone = phone
     return prepare_russian_phone(phone)
-
-
-@app.route('/api/v1/last-phone/', methods=['GET'])
-def last_phone_page():
-    global last_phone
-    return last_phone
 
 
 if __name__ == '__main__':
