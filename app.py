@@ -1,17 +1,16 @@
 from typing import Type
 
-from os import getcwd
-from os.path import abspath
+from os import environ
+
+import redis
 
 from flask import Flask
 from flask import request
 
-from file_managers import FileManager
 from preparers_for_phone_number import PhoneNumberPreparer, PhoneNumberPlusSevenNinePreparer
 
 app = Flask(__name__)
-
-tmp_req_file_path = abspath(getcwd() + '/data/tmp_req.txt')
+redis_db = redis.from_url(environ['REDISCLOUD_URL'])
 
 
 def prepare_phone(phone_preparer_class: Type[PhoneNumberPreparer], phone: str):
@@ -36,17 +35,15 @@ def single_phone_page(phone=''):
 def echo_request_page():
     """Возвращает данные запроса, отладочная страница"""
     request_data = request.data
-    file_manager = FileManager(tmp_req_file_path)
-    file_manager.erase_file()
-    file_manager.write_text_to_file(str(request_data.decode("utf-8")))
+    redis_db.set('last_request', str(request_data.decode("utf-8")))
     return request_data
 
 
 @app.route('/api/v1/last-request/', methods=['GET'])
 def last_request_page():
     """Возвращает данные последнего запроса"""
-    # TODO добавить проверку токена, переделать работу с файлом на работу с redis
-    return FileManager(tmp_req_file_path).file_text
+    # TODO добавить проверку токена
+    return redis_db.get('last_request')
 
 
 if __name__ == '__main__':
