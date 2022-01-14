@@ -1,4 +1,3 @@
-import os
 from typing import Type
 
 from flask import Flask
@@ -24,22 +23,15 @@ def prepare_russian_phone(phone: str):
 @app.route('/api/v1/single-phone/<string:phone>', methods=['GET'])
 def single_phone_page(phone=''):
     """Возвращает подготовленный номер телефона на базе переданного"""
+    # TODO добавить проверку токена
     return prepare_russian_phone(phone)
 
 
 @app.route('/api/v1/echo-request/', methods=['POST'])
 def echo_request_page():
     """Возвращает данные запроса, отладочная страница"""
-    request_data = request.data
-    os.environ["last_request"] = str(request_data.decode("utf-8"))
-    return request_data
-
-
-@app.route('/api/v1/last-request/', methods=['GET'])
-def last_request_page():
-    """Возвращает данные последнего запроса"""
     # TODO добавить проверку токена
-    return os.environ.get('last_request')
+    return str(request.data.decode("utf-8"))
 
 
 if __name__ == '__main__':
